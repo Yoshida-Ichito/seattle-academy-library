@@ -59,8 +59,11 @@ public class BookUtil {
 			Date date1 = formatter.parse(publishDate);//IntegerparseIntのparseを使って、String型のpublishDataを数字に変換してるのかな
 			String date2 = formatter.format(date1);
 			
-			publishDate.equals(date2);
-			return true;
+			if(publishDate.equals(date2)) {
+				return true;
+			} else {
+				return false;
+			}	
 		} catch (Exception p) {
 			p.printStackTrace();
 			return false;
