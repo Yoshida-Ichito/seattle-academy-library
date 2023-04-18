@@ -60,7 +60,6 @@ public class BookUtil {
 			String date2 = formatter.format(date1);
 			
 			publishDate.equals(date2);
-			
 			return true;
 		} catch (Exception p) {
 			p.printStackTrace();
