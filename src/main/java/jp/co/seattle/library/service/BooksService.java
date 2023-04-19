@@ -75,7 +75,7 @@ public class BooksService {
 	 * @param bookId 書籍ID
 	 */
 	public void deleteBook(int bookId) {
-		// TODO 対象の書籍を削除するようにSQLを修正（タスク6）
+		// TODO 対象の書籍を削除するようにSQLを修正（タスク6,
 		String sql = "DELETE FROM books WHERE books.id = ?;";
 		jdbcTemplate.update(sql, bookId);
 	}

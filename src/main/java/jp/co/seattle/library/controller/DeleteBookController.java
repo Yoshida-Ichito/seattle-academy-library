@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import jp.co.seattle.library.service.BooksService;
 
 @Controller
-public class DeleteBookController {
+public class DeleteBookController{
 	
 		final static Logger logger = LoggerFactory.getLogger(DeleteBookController.class);
 
