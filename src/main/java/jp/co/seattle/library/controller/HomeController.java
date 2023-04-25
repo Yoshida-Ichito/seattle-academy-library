@@ -1,7 +1,6 @@
 package jp.co.seattle.library.controller;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public class HomeController {
 	public String transitionHome(Model model) {
 		//書籍の一覧情報を取得（タスク３）
 		List<BookInfo> books = booksService.getBookList();
-		if (Objects.isNull(books)) {
+		if (books.isEmpty()) {
 			model.addAttribute("resultMessage", "書籍がありません");
 		} else {
 			model.addAttribute("bookList", books);
