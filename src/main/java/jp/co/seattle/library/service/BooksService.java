@@ -38,6 +38,16 @@ public class BooksService {
 
 		return getedBookList;
 	}
+	
+	public List<BookInfo> serchBook(String bookTitle) {
+
+		
+		List<BookInfo> getserchBook = jdbcTemplate.query(
+				"SELECT * FROM books WHERE title like concat('%',?,'%') ORDER BY title;",
+				new BookInfoRowMapper(), bookTitle);
+
+		return getserchBook;
+	}
 
 	/**
 	 * 書籍IDに紐づく書籍詳細情報を取得する
