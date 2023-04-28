@@ -50,7 +50,7 @@ public class BookUtil {
 	 * 
 	 * @param publishDate
 	 * @return
-	 */
+	 */                                     
 	private static boolean checkDate(String publishDate) {
 		try {
 			DateFormat formatter = new SimpleDateFormat("yyyyMMdd");
