@@ -33,6 +33,12 @@ public class UsersService {
 
 		jdbcTemplate.update(sql);
 	}
+	
+	public void updatePassword(UserInfo userInfo) {
+		String sql;
+		sql = "UPDATE books SET email = ?, password = ?,reg_date = now(),upd_date = now();";
+		jdbcTemplate.update(sql, userInfo.getEmail(), userInfo.getPassword());
+	}
 
 	/**
 	 * ユーザー情報取得

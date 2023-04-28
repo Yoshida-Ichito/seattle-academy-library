@@ -18,6 +18,11 @@
             <img class="mark" src="resources/img/logo.png" />
             <div class="logo">Seattle Library</div>
         </div>
+        <div class="right">
+            <ul>
+                <li><a href="<%=request.getContextPath()%>/reset" class="menu">パスワードリセット</a></li>
+            </ul>
+        </div>
         <div class="authorization">
             <div class="authorization_form">
                 <form method="post" action="login">
