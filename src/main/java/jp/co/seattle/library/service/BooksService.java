@@ -1,12 +1,15 @@
 package jp.co.seattle.library.service;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import jp.co.seattle.library.dto.BookDetailsInfo;
 import jp.co.seattle.library.dto.BookInfo;
@@ -33,10 +36,20 @@ public class BooksService {
 
 		// TODO 書籍名の昇順で書籍情報を取得するようにSQLを修正（タスク３）
 		List<BookInfo> getedBookList = jdbcTemplate.query(
-				"",
+				"SELECT id, title, author, publisher, publish_date, isbn, description, thumbnail_url, favorite, readstatus, genre FROM books ORDER BY title ASC;",
 				new BookInfoRowMapper());
 
 		return getedBookList;
+	}
+	
+	public List<BookInfo> serchBook(String bookTitle) {
+
+		
+		List<BookInfo> getserchBook = jdbcTemplate.query(
+				"SELECT * FROM books WHERE title like concat('%',?,'%') ORDER BY title;",
+				new BookInfoRowMapper(), bookTitle);
+
+		return getserchBook;
 	}
 
 	/**
@@ -46,7 +59,7 @@ public class BooksService {
 	 * @return 書籍情報
 	 */
 	public BookDetailsInfo getBookInfo(int bookId) {
-		String sql = "SELECT id, title, author, publisher, publish_date, isbn, description, thumbnail_url, thumbnail_name FROM books WHERE books.id = ? ORDER BY title ASC;";
+		String sql = "SELECT id, title, author, publisher, publish_date, isbn, description, thumbnail_url, thumbnail_name, favorite, genre FROM books WHERE books.id = ? ORDER BY title ASC;";
 
 		BookDetailsInfo bookDetailsInfo = jdbcTemplate.queryForObject(sql, new BookDetailsInfoRowMapper(), bookId);
 
@@ -61,11 +74,11 @@ public class BooksService {
 	 */
 	public int registBook(BookDetailsInfo bookInfo) {
 		// TODO 取得した書籍情報を登録し、その書籍IDを返却するようにSQLを修正（タスク４）
-		String sql = "";
+		String sql = "INSERT INTO books(title, author, publisher, publish_date,thumbnail_name, thumbnail_url, isbn, description, favorite, readstatus, genre, reg_date, upd_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now()) RETURNING id;";
 
 		int bookId = jdbcTemplate.queryForObject(sql, int.class, bookInfo.getTitle(), bookInfo.getAuthor(),
 				bookInfo.getPublisher(), bookInfo.getPublishDate(), bookInfo.getThumbnailName(),
-				bookInfo.getThumbnailUrl(), bookInfo.getIsbn(), bookInfo.getDescription());
+				bookInfo.getThumbnailUrl(), bookInfo.getIsbn(), bookInfo.getDescription(), bookInfo.getDescription(), bookInfo.getReadStatus(), bookInfo.getGenre());
 		return bookId;
 	}
 
@@ -75,8 +88,8 @@ public class BooksService {
 	 * @param bookId 書籍ID
 	 */
 	public void deleteBook(int bookId) {
-		// TODO 対象の書籍を削除するようにSQLを修正（タスク6）
-		String sql = "";
+		// TODO 対象の書籍を削除するようにSQLを修正（タスク6,
+		String sql = "DELETE FROM books WHERE books.id = ?;";
 		jdbcTemplate.update(sql, bookId);
 	}
 
@@ -89,15 +102,97 @@ public class BooksService {
 		String sql;
 		if (bookInfo.getThumbnailUrl() == null) {
 			// TODO 取得した書籍情報を更新するようにSQLを修正（タスク５）
-			sql = "";
+			sql = "UPDATE books SET title = ?, author = ?, publisher = ?, publish_date = ?, isbn = ?, description = ?, genre = ?, upd_date = now() WHERE id = ?;";
 			jdbcTemplate.update(sql, bookInfo.getTitle(), bookInfo.getAuthor(), bookInfo.getPublisher(),
-					bookInfo.getPublishDate(), bookInfo.getIsbn(), bookInfo.getDescription(), bookInfo.getBookId());
+					bookInfo.getPublishDate(), bookInfo.getIsbn(), bookInfo.getDescription(), bookInfo.getGenre(), bookInfo.getBookId());
 		} else {
 			// TODO 取得した書籍情報を更新するようにSQLを修正（タスク５）
-			sql = "";
+			sql = "UPDATE books SET title = ?, author = ?, publisher = ?, publish_date = ?, thumbnail_name = ?, thumbnail_url = ?, isbn = ?, description = ?, genre = ?, upd_date = now() WHERE id = ?;";
 			jdbcTemplate.update(sql, bookInfo.getTitle(), bookInfo.getAuthor(), bookInfo.getPublisher(),
 					bookInfo.getPublishDate(), bookInfo.getThumbnailName(), bookInfo.getThumbnailUrl(),
-					bookInfo.getIsbn(), bookInfo.getDescription(), bookInfo.getBookId());
+					bookInfo.getIsbn(), bookInfo.getDescription(), bookInfo.getGenre(), bookInfo.getBookId());
+			
 		}
 	}
+	
+	/*
+	  * お気に入り登録されているものを取得する
+	  */
+	 public List<BookInfo> getFavBook() {
+	  List<BookInfo> getedBookList = jdbcTemplate.query(
+	    "SELECT * FROM books WHERE favorite='like' ORDER BY title asc;",
+	    new BookInfoRowMapper());
+
+	  return getedBookList;
+	 }
+	 
+	 public List<BookInfo> serchedBook(String bookTitle) {
+
+			
+			List<BookInfo> getserchBook = jdbcTemplate.query(
+					"SELECT * FROM books WHERE favorite = 'like' AND title like concat('%',?,'%') ORDER BY title;",
+					new BookInfoRowMapper(), bookTitle);
+
+			return getserchBook;
+		}
+
+	/*
+	  * お気に入りを登録する
+	  */
+	 public void getFavorite(int bookId) {
+	  String sql = "UPDATE books SET favorite='like' WHERE books.id = ?;";
+	  jdbcTemplate.update(sql, bookId);																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																				
+	 }
+
+	 /*
+	  * お気に入りを削除する
+	  */
+	 public void deleteFavBook(int bookId) {
+	  // TODO 対象の書籍を削除するようにSQLを修正（タスク6）
+	  String sql = "UPDATE books SET favorite='unlike' WHERE books.id = ?;";
+	  jdbcTemplate.update(sql, bookId);
+	 }
+	 
+	 public void state_check(String value, int bookId) {
+		 String sql = "UPDATE books SET readstatus = ? WHERE books.id = ?;";
+		 jdbcTemplate.update(sql, value, bookId);
+	 }
+	 
+	 public List<BookInfo> getShelfBook() {
+		  List<BookInfo> getedBookList = jdbcTemplate.query(
+		    "SELECT * FROM books WHERE shelf='register' ORDER BY title asc;",
+		    new BookInfoRowMapper());
+
+		  return getedBookList;
+		 }
+	 
+	 
+	 
+	 public void getRegistShelfBook(int bookId) {
+		  String sql = "UPDATE books SET shelf='register' WHERE books.id = ?;";
+
+		  jdbcTemplate.update(sql, bookId);
+		 }
+	 
+	 
+	 @Autowired
+	 private RestTemplate restTemplate;
+	 
+	 
+	 @Bean
+	 public RestTemplate restTemplate() {
+	  return new RestTemplate();
+	 }
+	 
+	 public String getApi(BookDetailsInfo bookInfo) {
+		 ResourceBundle rb = ResourceBundle.getBundle("api");
+		  String url = rb.getString("url");
+		  String title = restTemplate.postForObject(url, bookInfo, String.class);
+		  return title;
+	 }
+	 
+	 
+	 
+	 
+	 
 }

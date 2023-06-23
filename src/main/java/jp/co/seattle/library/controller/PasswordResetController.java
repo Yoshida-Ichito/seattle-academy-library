@@ -14,58 +14,42 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.co.seattle.library.dto.UserInfo;
 import jp.co.seattle.library.service.UsersService;
-
-/**
- * アカウント作成コントローラー
- */
-@Controller // APIの入り口
-public class AccountController {
+@Controller
+public class PasswordResetController {
 	final static Logger logger = LoggerFactory.getLogger(LoginController.class);
 
 	@Autowired
 	private UsersService usersService;
 
-	@RequestMapping(value = "/newAccount", method = RequestMethod.GET) // value＝actionで指定したパラメータ
-	public String createAccount(Model model) {
-		return "createAccount";
+	@RequestMapping(value = "/reset", method = RequestMethod.GET)
+	public String first(Model model) {
+		return "passwordReset"; // jspファイル名
 	}
-
-	/**
-	 * 新規アカウント作成
-	 *
-	 * @param email            メールアドレス
-	 * @param password         パスワード
-	 * @param passwordForCheck 確認用パスワード
-	 * @param model
-	 * @return ホーム画面に遷移
-	 */
+	
+	
 	@Transactional
-	@RequestMapping(value = "/createAccount", method = RequestMethod.POST)
-	public String createAccount(Locale locale, @RequestParam("email") String email,
+	@RequestMapping(value = "/passwordReset", method = RequestMethod.POST)
+	public String passwordReset(Locale locale, @RequestParam("email") String email,
 			@RequestParam("password") String password, @RequestParam("passwordForCheck") String passwordForCheck,
 			Model model) {
 		// デバッグ用ログ
 		logger.info("Welcome createAccount! The client locale is {}.", locale);
-
-		// バリデーションチェック、パスワード一致チェック（タスク１）
+		
 		if (password.length() >= 8 && password.matches("^[a-zA-Z0-9]+$")) {
 			if (password.equals(passwordForCheck)) {
 				// パラメータで受け取ったアカウント情報をDtoに格納する。
 				UserInfo userInfo = new UserInfo();
 				userInfo.setEmail(email);
 				userInfo.setPassword(password);
-				usersService.registUser(userInfo);
+				usersService.updatePassword(userInfo);
 			} else {
 				model.addAttribute("errorMessage", "パスワードが一致しません。");
-				return "createAccount";
+				return "passwordReset";
 			}
 		} else {
 			model.addAttribute("errorMessage", "パスワードは8文字以上かつ半角英数字に設定してください。");
-			return "createAccount";
+			return "passwordReset";
 		}
-		return "redirect:/login";
+		return "redirect:/";
 	}
-
-	// パラメータで受け取ったアカウント情報をDtoに格納する。
-
 }

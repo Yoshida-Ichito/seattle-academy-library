@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.co.seattle.library.commonutil.BookUtil;
 import jp.co.seattle.library.dto.BookDetailsInfo;
@@ -37,6 +38,16 @@ public class EditBookController {
 		return "editBook";
 	}
 
+	@RequestMapping(value = "/bookApi", method = RequestMethod.POST)
+		public String bookApi(Locale locale, int bookId, Model model, RedirectAttributes redirectAttributes) {
+			logger.info("Welcome EditBooks.java! The client locale is {}.", locale);
+			BookDetailsInfo bookInfo = booksService.getBookInfo(bookId);
+			String apiTitle  = booksService.getApi(bookInfo);
+			redirectAttributes.addFlashAttribute("successMessage",apiTitle);
+			return "redirect:/editBook?bookId=" + bookId;
+		}
+	
+	
 	/**
 	 * 書籍情報を更新する
 	 * 
@@ -48,6 +59,7 @@ public class EditBookController {
 	 * @param file        サムネイルファイル
 	 * @param isbn        ISBN
 	 * @param description 説明文
+	 * @param bookGenre   ジャンル
 	 * @param model       モデル
 	 * @return 遷移先画面
 	 */
@@ -56,10 +68,11 @@ public class EditBookController {
 	public String updateBook(Locale locale, @RequestParam("bookId") int bookId, @RequestParam("title") String title,
 			@RequestParam("author") String author, @RequestParam("publisher") String publisher,
 			@RequestParam("publishDate") String publishDate, @RequestParam("isbn") String isbn,
-			@RequestParam("description") String description, @RequestParam("thumbnail") MultipartFile file,
+			@RequestParam("description") String description, @RequestParam("bookGenre") String bookGenre, @RequestParam("thumbnail") MultipartFile file,
 			Model model) {
 		logger.info("Welcome updateBook! The client locale is {}.", locale);
-
+     
+	
 		// パラメータで受け取った書籍情報をDtoに格納する。
 		BookDetailsInfo bookInfo = new BookDetailsInfo();
 		bookInfo.setBookId(bookId);
@@ -69,7 +82,11 @@ public class EditBookController {
 		bookInfo.setPublishDate(publishDate);
 		bookInfo.setIsbn(isbn);
 		bookInfo.setDescription(description);
-
+		bookInfo.setGenre(bookGenre);
+		
+		System.out.println(bookInfo + "あほ");
+		System.out.println(bookInfo.getGenre() + "くそ");
+		
 		List<String> errorList = bookUtil.checkBookInfo(bookInfo);
 		// errorListに一つでもエラーメッセージが入っていたら登録しない
 		if (errorList.size() > 0) {
