@@ -59,7 +59,7 @@ public class AddBooksController {
 	public String insertBook(Locale locale, @RequestParam("title") String title, @RequestParam("author") String author,
 			@RequestParam("publisher") String publisher, @RequestParam("publishDate") String publishDate,
 			@RequestParam("isbn") String isbn, @RequestParam("description") String description,
-			@RequestParam("thumbnail") MultipartFile file, Model model, RedirectAttributes redirectAttributes) {
+			@RequestParam("thumbnail") MultipartFile file, Model model, @RequestParam("readStatus") String readStatus, RedirectAttributes redirectAttributes) {
 		logger.info("Welcome insertBooks.java! The client locale is {}.", locale);
 
 		// パラメータで受け取った書籍情報をDtoに格納する。
@@ -70,8 +70,9 @@ public class AddBooksController {
 		bookInfo.setPublishDate(publishDate);
 		bookInfo.setIsbn(isbn);
 		bookInfo.setDescription(description);
+		bookInfo.setReadStatus(readStatus);
 
-		List<String> errorList = bookUtil.checkBookInfo(bookInfo);
+		List<String> errorList = bookUtil.checkBookInfoInfo(bookInfo);
 		// errorListに一つでもエラーメッセージが入っていたら登録しない
 		if (errorList.size() > 0) {
 			redirectAttributes.addFlashAttribute("bookInfo", bookInfo);

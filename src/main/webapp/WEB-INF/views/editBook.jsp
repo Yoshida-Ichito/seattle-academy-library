@@ -29,6 +29,27 @@
         </div>
     </header>
     <main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <script>
+        $(function() {
+            $("#adultButton").click(function() {
+                $("#ageConfirmationModal").show();
+            });
+
+            $("#disapear").click(function() {
+             $("#ageConfirmationModal").fadeOut();
+            });
+            
+            $("#confirmYes").click(function() {
+                window.location.href = "http://localhost:8080/SeattleLibrary/deleteBook";
+            });
+
+            $("#confirmNo").click(function() {
+                $("#ageConfirmationModal").fadeOut();
+            });
+        });
+    </script>
+ </script>
         <form action="<%=request.getContextPath()%>/updateBook" method="post" enctype="multipart/form-data" id="data_upload_form">
             <h1>書籍の編集</h1>
             <div class="content_body add_book_content">
@@ -69,25 +90,76 @@
                             <input type="text" name="publishDate" value="${bookInfo.publishDate}">
                     </div>
                     <div>
-                        <span>ISBN</span><span class="care care1">任意</span>
-                            <input type="text" name="isbn" value="${bookInfo.isbn}">
-                    </div>
-                    <div>
-                        <span>説明文</span><span class="care care1">任意</span>
-                         
-                            <input type="text" name="description" value="${bookInfo.description}">
-                        
-                    </div>
+                         <span>ISBN</span><span class="care care1">任意</span>
+                         <c:if test="${!empty bookInfo.isbn}">
+                             <input type="text" name="isbn" value="${bookInfo.isbn}">
+                         </c:if>
+                         <c:if test="${empty bookInfo.isbn}">
+                             <input type="text" name="isbn">
+                         </c:if>
+                     </div>
+                  <div>
+                         <span>説明文</span><span class="care care1">任意</span>
+                         <c:if test="${!empty bookInfo.description}">
+                             <input type="text" name="description" value="${bookInfo.description}">
+                         </c:if>
+                         <c:if test="${empty bookInfo.description}">
+                             <input type="text" name="description">
+                         </c:if>
+                     </div>
+                     <div>
+                         <span>ジャンル</span><span class="care care1">任意</span>
+                         <label class="selectbox-005">
+                           <select name="bookGenre">
+                             <option value="firstSelect">選択してください</option>
+                             <option value="小説">小説</option>
+                             <option value="漫画">漫画</option>
+                             <option value="絵本">絵本</option>
+                        </select>
+                        </label>
+                    </div> 
                     <input type="hidden" id="bookId" name="bookId" value="${bookInfo.bookId}">
                 </div>
             </div>
             <div class="bookBtn_box">
                 <button type="submit" id="add-btn" class="btn_updateBook">更新</button>
         </form>
-        <form method="post" action="deleteBook" name="delete">
-            <input type="hidden" id="bookId" name="bookId" value="${bookInfo.bookId}">
-            <button type="submit" id="delete-btn" class="btn_deleteBook">削除</button>
-        </form>
+        <div class="deleteMove">
+   <button type="button" id="adultButton" class="btn_deleteBook">削除</button>
+   <form action="<%=request.getContextPath()%>/bookApi" method="post">
+   <button type="button" class="btn_deleteBook">書籍出力</button>
+   <input type="hidden" id="bookId" name="bookId" value="${bookInfo.bookId}">
+   </form>
+  
+  <c:if test="${!empty successMessage}">
+                 <div class="error_msg">${successMessage}</div>
+                 </c:if>
+   <!-- モーダル -->
+   <div id="ageConfirmationModal" class="modal">
+    <div class="modal-dialog">
+     <div class="modal-content">
+      <div class="modal-header">
+       <button type="button" id="disapear" class="close"
+        data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+       </button>
+      </div>
+      <div class="modal-body">
+       <p>本当に削除しますか？</p>
+      </div>
+      <div class="modal-footer">
+       <form method="post" action="deleteBook">
+        <input type="hidden" id="bookId" name="bookId"
+         value="${bookInfo.bookId}">
+        <button id="confirmYes" class="modal-button">はい</button>
+       </form>
+       <button type="button" id="confirmNo" class="modal-button"
+        data-dismiss="modal">いいえ</button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
         </div>
     </main>
 </body>

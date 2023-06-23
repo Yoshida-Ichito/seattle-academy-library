@@ -19,6 +19,7 @@ public class BookUtil {
 	private static final String REQUIRED_ERROR = "未入力の必須項目があります";
 	private static final String ISBN_ERROR = "ISBNの桁数または半角数字が正しくありません";
 	private static final String PUBLISHDATE_ERROR = "出版日は半角数字のYYYYMMDD形式で入力してください";
+	private static final String READSTATUS_ERROR = "本の読み状況を選択してください";
 
 	/**
 	 * 登録前のバリデーションチェック
@@ -41,6 +42,33 @@ public class BookUtil {
 		// 出版日の形式チェック
        if(!(checkDate(bookInfo.getPublishDate()))) {
     	   errorList.add(PUBLISHDATE_ERROR);
+       }
+       
+//       if(checkRead(bookInfo.getReadStatus())) {
+//    	   errorList.add(READSTATUS_ERROR);
+//       }
+		return errorList;
+	}
+	
+	public List<String> checkBookInfoInfo(BookDetailsInfo bookInfo) {
+
+		//TODO　各チェックNGの場合はエラーメッセージをリストに追加（タスク４）
+		List<String> errorList = new ArrayList<>();
+		// 必須チェック
+        if(isEmptyBookInfo(bookInfo)) {
+        	errorList.add(REQUIRED_ERROR);
+        }
+		// ISBNのバリデーションチェック
+        if(!(isValidIsbn(bookInfo.getIsbn()))) {
+        	errorList.add(ISBN_ERROR);
+        }
+		// 出版日の形式チェック
+       if(!(checkDate(bookInfo.getPublishDate()))) {
+    	   errorList.add(PUBLISHDATE_ERROR);
+       }
+       
+       if(checkRead(bookInfo.getReadStatus())) {
+    	   errorList.add(READSTATUS_ERROR);
        }
 		return errorList;
 	}
@@ -101,6 +129,14 @@ public class BookUtil {
 				|| StringUtils.isEmpty(bookInfo.getPublisher()) || StringUtils.isEmpty(bookInfo.getPublishDate())) {
 			return true;
 		} else {
+			return false;
+		}
+	}
+	
+	private static boolean checkRead(String readStatus) {
+		if(readStatus.isEmpty()) {
+			return true;
+		}else {
 			return false;
 		}
 	}
